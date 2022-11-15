@@ -1,17 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IFile } from 'src/files/file-type';
 import { FilesService } from 'src/files/files.service';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Message, MessageType } from './entities/message.entity';
+import data from '../data/data';
 
 @Injectable()
-export class MessagesService {
+export class MessagesService implements OnApplicationBootstrap {
   constructor(
     @InjectRepository(Message) private messageRepository: Repository<Message>,
     private fileService: FilesService,
   ) {}
+
+  onApplicationBootstrap() {
+    this.messageRepository.save(this.messageRepository.create(data));
+  }
 
   async create(createMessageDto: CreateMessageDto, file?: IFile) {
     if (file) {
